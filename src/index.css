@@ -8,6 +8,9 @@ body {
   background: #f5f5f5;
   font-family: Arial, Helvetica, sans-serif;
   color: #222;
+
+  /* Space for fixed audio player */
+  padding-bottom: 140px;
 }
 
 /*LINKS*/
@@ -431,6 +434,180 @@ a {
   line-height: 1.7;
 }
 
+/*EPISODE HEADER*/
+
+.episode-header {
+  display: flex;
+
+  justify-content: space-between;
+  align-items: center;
+
+  gap: 1rem;
+
+  margin-bottom: 1rem;
+}
+
+/*EPISODE PLAY BUTTON*/
+
+.episode-play-btn {
+  flex-shrink: 0;
+
+  padding: .7rem 1.3rem;
+
+  border: none;
+  border-radius: 10px;
+
+  background: #111;
+  color: white;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: .25s;
+}
+
+.episode-play-btn:hover {
+  background: #333;
+
+  transform: translateY(-2px);
+}
+
+.play-button:hover {
+  background: #333;
+
+  transform: translateY(-2px);
+}
+
+/*GLOBAL AUDIO PLAYER*/
+
+.audio-player {
+  position: fixed;
+
+  bottom: 0;
+  left: 0;
+
+  width: 100%;
+
+  background: white;
+
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+
+  padding: 1rem 2rem;
+
+  box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.12);
+
+  z-index: 1000;
+}
+
+/*PLAYER COVER*/
+
+.player-cover img {
+  width: 70px;
+  height: 70px;
+
+  border-radius: 12px;
+
+  object-fit: cover;
+}
+
+/*PLAYER DETAILS*/
+
+.player-details {
+  min-width: 220px;
+}
+
+.player-details h3 {
+  margin-bottom: .35rem;
+
+  font-size: 1rem;
+
+  color: #111;
+}
+
+.player-details p {
+  color: #666;
+
+  font-size: .9rem;
+}
+
+/*PLAYER CONTROLS*/
+
+.player-controls {
+  display: flex;
+
+  justify-content: center;
+  align-items: center;
+
+  flex-shrink: 0;
+}
+
+.play-button {
+  width: 55px;
+  height: 55px;
+
+  border: none;
+  border-radius: 50%;
+
+  background: #111;
+  color: white;
+
+  font-size: 1.3rem;
+
+  cursor: pointer;
+
+  transition: .25s;
+}
+
+.play-button:hover {
+  background: #333;
+
+  transform: scale(1.08);
+}
+
+/*PLAYER PROGRESS*/
+
+.player-progress {
+  flex: 1;
+
+  display: flex;
+  align-items: center;
+
+  gap: 1rem;
+}
+
+.time {
+  width: 45px;
+
+  font-size: .9rem;
+
+  color: #666;
+
+  text-align: center;
+}
+
+/*PROGRESS BAR*/
+
+.progress-bar {
+  flex: 1;
+
+  cursor: pointer;
+}
+
+/*NO EPISODE*/
+
+.player-info h3 {
+  margin-bottom: .35rem;
+
+  color: #111;
+}
+
+.player-info p {
+  color: #666;
+}
+
 /*RESPONSIVE DESIGN*/
 
 @media (max-width: 900px) {
@@ -492,6 +669,20 @@ a {
     justify-content: center;
   }
 
+    .audio-player {
+    gap: 1rem;
+  }
+
+  .player-cover img {
+    width: 60px;
+    height: 60px;
+  }
+
+  .play-button {
+    width: 50px;
+    height: 50px;
+  }
+
 }
 
 @media (max-width: 480px) {
@@ -512,5 +703,29 @@ a {
   .episode-card {
     padding: 1rem;
   }
+  
+  .audio-player {
+    padding: .75rem;
+  }
+
+  .player-progress {
+    flex-direction: column;
+
+    gap: .5rem;
+  }
+
+  .progress-bar {
+    width: 100%;
+  }
+
+  .episode-header {
+  flex-direction: column;
+
+  align-items: stretch;
+}
+
+.episode-play-btn {
+  width: 100%;
+}
 
 }

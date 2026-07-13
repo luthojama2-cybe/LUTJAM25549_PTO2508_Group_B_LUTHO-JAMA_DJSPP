@@ -235,42 +235,44 @@ function ShowDetails({
                 className="episode-card"
               >
 
-                <div className="episode-content">
+        <div className="episode-content">
 
-                  <h3>
-                    Episode {episode.episode}:{" "}
-                    {episode.title}
-                  </h3>
+          <div className="episode-header">
 
-                  <p>
-                    {episode.description
-                      ? episode.description.length > 180
-                        ? `${episode.description.substring(
-                            0,
-                            180
-                          )}...`
-                        : episode.description
-                      : "No description available."}
-                  </p>
+            <h3>
+              Episode {episode.episode}:{" "}
+              {episode.title}
+            </h3>
 
-                  <button
-                    className="play-btn"
-                    onClick={() =>
-                      setCurrentEpisode({
-                        ...episode,
-                        podcastTitle:
-                          podcast.title,
-                        podcastImage:
-                          podcast.image,
-                        season:
-                          season.season,
-                      })
-                    }
-                  >
-                    ▶ Play Episode
-                  </button>
 
-                </div>
+          </div>
+
+          <p>
+            {episode.description
+              ? episode.description.length > 180
+                ? `${episode.description.substring(
+                    0,
+                    180
+                  )}...`
+                : episode.description
+              : "No description available."}
+          </p>
+
+        </div>
+        
+            <button
+              className="episode-play-btn"
+              onClick={() =>
+                setCurrentEpisode({
+                  ...episode,
+                  podcastTitle: podcast.title,
+                  podcastImage: podcast.image,
+                  season: season.season,
+                })
+              }
+            >
+              ▶ Play
+            </button>
 
               </article>
             )
