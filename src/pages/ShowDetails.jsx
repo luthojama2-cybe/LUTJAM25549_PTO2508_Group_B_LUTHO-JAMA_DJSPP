@@ -20,9 +20,14 @@ const genreMap = Object.fromEntries(
  * Displays detailed information
  * about a selected podcast.
  *
+ * @param {Object} props
+ * @param {Function} props.setCurrentEpisode
+ *
  * @returns {JSX.Element}
  */
-function ShowDetails() {
+function ShowDetails({
+  setCurrentEpisode,
+}) {
   /**
    * Podcast ID from the URL.
    */
@@ -33,9 +38,14 @@ function ShowDetails() {
    */
   const location = useLocation();
 
-  const [podcast, setPodcast] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [podcast, setPodcast] =
+    useState(null);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [error, setError] =
+    useState(null);
 
   /**
    * Currently selected season.
@@ -44,19 +54,16 @@ function ShowDetails() {
     useState(0);
 
   /**
-   * Fetch podcast data.
+   * Fetch podcast.
    */
   useEffect(() => {
     async function loadPodcast() {
       try {
-        const data = await getPodcast(id);
+        const data =
+          await getPodcast(id);
 
         setPodcast(data);
 
-        /**
-         * Display the first season
-         * by default.
-         */
         setSelectedSeason(0);
       } catch (err) {
         setError(err.message);
@@ -95,21 +102,23 @@ function ShowDetails() {
   /**
    * Convert genre IDs into names.
    */
-  const genreNames = (podcast.genres || []).map(
-    (genreId) =>
-      genreMap[genreId] || "Unknown"
-  );
+  const genreNames =
+    (podcast.genres || []).map(
+      (genreId) =>
+        genreMap[genreId] ||
+        "Unknown"
+    );
 
   /**
-   * Currently selected season.
+   * Selected season.
    */
   const season =
-    podcast.seasons[selectedSeason];
+    podcast.seasons?.[selectedSeason];
 
   return (
     <main className="show-details">
 
-      {/*BACK BUTTON*/}
+      {/* BACK BUTTON */}
 
       <Link
         to="/"
@@ -119,7 +128,7 @@ function ShowDetails() {
         ← Back to Podcasts
       </Link>
 
-      {/*SHOW DETAILS*/}
+      {/* SHOW DETAILS */}
 
       <section className="show-header">
 
@@ -147,7 +156,7 @@ function ShowDetails() {
 
           <p>
             <strong>Seasons:</strong>{" "}
-            {podcast.seasons?.length || 0}
+            {podcast.seasons.length}
           </p>
 
           <p className="show-description">
@@ -158,7 +167,7 @@ function ShowDetails() {
 
       </section>
 
-      {/*SEASON NAVIGATION*/}
+      {/* SEASON NAVIGATION */}
 
       <section className="season-selector">
 
@@ -166,7 +175,7 @@ function ShowDetails() {
 
         <div className="season-buttons">
 
-          {podcast.seasons?.map(
+          {podcast.seasons.map(
             (season, index) => (
               <button
                 key={`${podcast.id}-${season.season}`}
@@ -185,65 +194,90 @@ function ShowDetails() {
           )}
 
         </div>
-      </section>
-            {/*SELECTED SEASON*/}
-
-      <section className="season-details">
-
-        <img
-          src={season.image}
-          alt={season.title}
-          className="season-image"
-        />
-
-        <div className="season-info">
-
-          <h2>{season.title}</h2>
-
-          <p>
-            <strong>Episodes:</strong>{" "}
-            {season.episodes.length}
-          </p>
-
-        </div>
 
       </section>
 
-      {/*EPISODE LIST*/}
+      {/* SELECTED SEASON */}
 
-      <section className="episode-list">
+      {season && (
+        <section className="season-details">
 
-        <h2>Episodes</h2>
+          <img
+            src={season.image}
+            alt={season.title}
+            className="season-image"
+          />
 
-        {season.episodes.map(
-          (episode, index) => (
-            <article
-              key={episode.title}
-              className="episode-card"
-            >
+          <div className="season-info">
 
-              <div className="episode-content">
-
-                <h3>
-                  Episode {index + 1}:{" "}
-                  {episode.title}
-                </h3>
+            <h2>{season.title}</h2>
 
             <p>
-              {episode.description
-                ? episode.description.length > 180
-                  ? `${episode.description.substring(0, 180)}...`
-                  : episode.description
-                : "No description available."}
+              <strong>Episodes:</strong>{" "}
+              {season.episodes.length}
             </p>
 
-              </div>
+          </div>
 
-            </article>
-          )
-        )}
+        </section>
+      )}
+            {/* EPISODE LIST */}
 
-      </section>
+      {season && (
+        <section className="episode-list">
+
+          <h2>Episodes</h2>
+
+          {season.episodes.map(
+            (episode, index) => (
+              <article
+                key={`${season.season}-${index}`}
+                className="episode-card"
+              >
+
+                <div className="episode-content">
+
+                  <h3>
+                    Episode {episode.episode}:{" "}
+                    {episode.title}
+                  </h3>
+
+                  <p>
+                    {episode.description
+                      ? episode.description.length > 180
+                        ? `${episode.description.substring(
+                            0,
+                            180
+                          )}...`
+                        : episode.description
+                      : "No description available."}
+                  </p>
+
+                  <button
+                    className="play-btn"
+                    onClick={() =>
+                      setCurrentEpisode({
+                        ...episode,
+                        podcastTitle:
+                          podcast.title,
+                        podcastImage:
+                          podcast.image,
+                        season:
+                          season.season,
+                      })
+                    }
+                  >
+                    ▶ Play Episode
+                  </button>
+
+                </div>
+
+              </article>
+            )
+          )}
+
+        </section>
+      )}
 
     </main>
   );
