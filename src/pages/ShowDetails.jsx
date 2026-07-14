@@ -17,24 +17,25 @@ const genreMap = Object.fromEntries(
 /**
  * Show Details page.
  *
- * Displays detailed information
- * about a selected podcast.
- *
  * @param {Object} props
  * @param {Function} props.setCurrentEpisode
+ * @param {Array} props.favourites
+ * @param {Function} props.setFavourites
  *
  * @returns {JSX.Element}
  */
 function ShowDetails({
   setCurrentEpisode,
+  favourites,
+  setFavourites,
 }) {
   /**
-   * Podcast ID from the URL.
+   * Podcast ID from URL.
    */
   const { id } = useParams();
 
   /**
-   * Preserve Home page state.
+   * Preserve Home state.
    */
   const location = useLocation();
 
@@ -113,7 +114,54 @@ function ShowDetails({
    * Selected season.
    */
   const season =
-    podcast.seasons?.[selectedSeason];
+    podcast.seasons[selectedSeason];
+
+  /**
+   * Returns true if the episode
+   * has already been favourited.
+   */
+  function isFavourite(episode) {
+    return favourites.some(
+      (fav) =>
+        fav.podcastId === podcast.id &&
+        fav.season === season.season &&
+        fav.episode === episode.episode
+    );
+  }
+
+  /**
+   * Add or remove an episode
+   * from favourites.
+   */
+  function toggleFavourite(episode) {
+    if (isFavourite(episode)) {
+      setFavourites(
+        favourites.filter(
+          (fav) =>
+            !(
+              fav.podcastId === podcast.id &&
+              fav.season === season.season &&
+              fav.episode === episode.episode
+            )
+        )
+      );
+
+      return;
+    }
+
+    setFavourites([
+      ...favourites,
+      {
+        podcastId: podcast.id,
+        podcastTitle: podcast.title,
+        podcastImage: podcast.image,
+
+        season: season.season,
+
+        ...episode,
+      },
+    ]);
+  }
 
   return (
     <main className="show-details">
@@ -229,50 +277,72 @@ function ShowDetails({
           <h2>Episodes</h2>
 
           {season.episodes.map(
-            (episode, index) => (
+            (episode) => (
               <article
-                key={`${season.season}-${index}`}
+                key={`${season.season}-${episode.episode}`}
                 className="episode-card"
               >
 
-        <div className="episode-content">
+                <div className="episode-content">
 
-          <div className="episode-header">
+                  {/* EPISODE HEADER */}
 
-            <h3>
-              Episode {episode.episode}:{" "}
-              {episode.title}
-            </h3>
+                  <div className="episode-header">
 
+                    <h3>
+                      Episode {episode.episode}:{" "}
+                      {episode.title}
+                    </h3>
 
-          </div>
+                    <div className="episode-actions">
 
-          <p>
-            {episode.description
-              ? episode.description.length > 180
-                ? `${episode.description.substring(
-                    0,
-                    180
-                  )}...`
-                : episode.description
-              : "No description available."}
-          </p>
+                      <button
+                        className="favourite-btn"
+                        onClick={() =>
+                          toggleFavourite(episode)
+                        }
+                      >
+                        {isFavourite(episode)
+                          ? "❤️"
+                          : "🤍"}
+                      </button>
 
-        </div>
-        
-            <button
-              className="episode-play-btn"
-              onClick={() =>
-                setCurrentEpisode({
-                  ...episode,
-                  podcastTitle: podcast.title,
-                  podcastImage: podcast.image,
-                  season: season.season,
-                })
-              }
-            >
-              ▶ Play
-            </button>
+                      <button
+                        className="episode-play-btn"
+                        onClick={() =>
+                          setCurrentEpisode({
+                            ...episode,
+                            podcastTitle:
+                              podcast.title,
+                            podcastImage:
+                              podcast.image,
+                            podcastId:
+                              podcast.id,
+                            season:
+                              season.season,
+                          })
+                        }
+                      >
+                        ▶ Play
+                      </button>
+
+                    </div>
+
+                  </div>
+
+                  <p>
+                    {episode.description
+                      ? episode.description
+                          .length > 180
+                        ? `${episode.description.substring(
+                            0,
+                            180
+                          )}...`
+                        : episode.description
+                      : "No description available."}
+                  </p>
+
+                </div>
 
               </article>
             )

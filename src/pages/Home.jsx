@@ -3,7 +3,10 @@ import {
   useEffect,
   useRef,
 } from "react";
-import { useLocation } from "react-router-dom";
+import {
+  Link,
+  useLocation,
+} from "react-router-dom";
 import { getPodcasts } from "../services/api";
 import PodcastPreviewCard from "../components/PodcastPreviewCard.jsx";
 import { genres } from "../data/data";
@@ -90,8 +93,10 @@ function Home() {
 
   const [podcasts, setPodcasts] =
     useState([]);
+
   const [loading, setLoading] =
     useState(true);
+
   const [error, setError] =
     useState(null);
 
@@ -134,6 +139,7 @@ function Home() {
       try {
         const data =
           await getPodcasts();
+
         setPodcasts(data);
       } catch (err) {
         setError(err.message);
@@ -243,34 +249,51 @@ function Home() {
       </div>
     );
   }
-    return (
+
+  return (
     <>
       {/*NAVBAR*/}
 
       <header className="navbar">
+
         <div className="logo">
           <span>🎙️</span>
           <h1>PodcastApp</h1>
         </div>
 
-        <input
-          type="text"
-          placeholder="Search podcasts..."
-          value={searchTerm}
-          onChange={(e) =>
-            setSearchTerm(e.target.value)
-          }
-          className="navbar-search"
-        />
-      </header>
+        <div className="navbar-actions">
 
-      {/*FILTERS*/}
+          <input
+            type="text"
+            placeholder="Search podcasts..."
+            value={searchTerm}
+            onChange={(e) =>
+              setSearchTerm(
+                e.target.value
+              )
+            }
+            className="navbar-search"
+          />
+
+          <Link
+            to="/favourites"
+            className="favourites-link"
+          >
+            ❤️ Favourites
+          </Link>
+
+        </div>
+
+      </header>
+            {/*FILTERS*/}
 
       <section className="controls">
         <select
           value={selectedGenre}
           onChange={(e) =>
-            setSelectedGenre(e.target.value)
+            setSelectedGenre(
+              e.target.value
+            )
           }
         >
           <option value="all">
@@ -290,7 +313,9 @@ function Home() {
         <select
           value={sortOrder}
           onChange={(e) =>
-            setSortOrder(e.target.value)
+            setSortOrder(
+              e.target.value
+            )
           }
         >
           <option value="az">
@@ -312,51 +337,73 @@ function Home() {
       ) : (
         <>
           <main className="podcast-grid">
-            {paginatedResults.map((podcast) => {
-              /**
-               * Convert genre IDs into
-               * readable genre names.
-               */
-              const genreNames = (
-                podcast.genres || []
-              ).map(
-                (genreId) =>
-                  genreMap[genreId] ||
-                  "Unknown"
-              );
 
-              return (
-                <PodcastPreviewCard
-                  key={podcast.id}
-                  id={podcast.id}
-                  image={podcast.image}
-                  title={podcast.title}
-                  seasons={podcast.seasons}
-                  genres={genreNames}
-                  updated={formatLastUpdated(
-                    podcast.updated
-                  )}
+            {paginatedResults.map(
+              (podcast) => {
+                /**
+                 * Convert genre IDs into
+                 * readable genre names.
+                 */
+                const genreNames = (
+                  podcast.genres || []
+                ).map(
+                  (genreId) =>
+                    genreMap[
+                      genreId
+                    ] || "Unknown"
+                );
 
-                  /* Preserve Home state */
-                  searchTerm={searchTerm}
-                  selectedGenre={selectedGenre}
-                  sortOrder={sortOrder}
-                  currentPage={currentPage}
-                />
-              );
-            })}
+                return (
+                  <PodcastPreviewCard
+                    key={podcast.id}
+                    id={podcast.id}
+                    image={podcast.image}
+                    title={podcast.title}
+                    seasons={
+                      podcast.seasons
+                    }
+                    genres={genreNames}
+                    updated={formatLastUpdated(
+                      podcast.updated
+                    )}
+
+                    /* Preserve Home state */
+                    searchTerm={
+                      searchTerm
+                    }
+                    selectedGenre={
+                      selectedGenre
+                    }
+                    sortOrder={
+                      sortOrder
+                    }
+                    currentPage={
+                      currentPage
+                    }
+                  />
+                );
+              }
+            )}
+
           </main>
 
           {/*PAGINATION*/}
 
           <div className="pagination">
+
             <button
               onClick={() =>
-                setCurrentPage((prev) =>
-                  Math.max(prev - 1, 1)
+                setCurrentPage(
+                  (prev) =>
+                    Math.max(
+                      prev - 1,
+                      1
+                    )
                 )
               }
-              disabled={currentPage === 1}
+              disabled={
+                currentPage === 1
+              }
             >
               Previous
             </button>
@@ -368,19 +415,22 @@ function Home() {
 
             <button
               onClick={() =>
-                setCurrentPage((prev) =>
-                  Math.min(
-                    prev + 1,
-                    totalPages
-                  )
+                setCurrentPage(
+                  (prev) =>
+                    Math.min(
+                      prev + 1,
+                      totalPages
+                    )
                 )
               }
               disabled={
-                currentPage === totalPages
+                currentPage ===
+                totalPages
               }
             >
               Next
             </button>
+
           </div>
         </>
       )}
