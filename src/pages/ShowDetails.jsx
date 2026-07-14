@@ -17,6 +17,9 @@ const genreMap = Object.fromEntries(
 /**
  * Show Details page.
  *
+ * Displays detailed information
+ * about a selected podcast.
+ *
  * @param {Object} props
  * @param {Function} props.setCurrentEpisode
  * @param {Array} props.favourites
@@ -55,7 +58,7 @@ function ShowDetails({
     useState(0);
 
   /**
-   * Fetch podcast.
+   * Fetch podcast data.
    */
   useEffect(() => {
     async function loadPodcast() {
@@ -111,14 +114,14 @@ function ShowDetails({
     );
 
   /**
-   * Selected season.
+   * Currently selected season.
    */
   const season =
     podcast.seasons[selectedSeason];
 
   /**
-   * Returns true if the episode
-   * has already been favourited.
+   * Returns true if an episode
+   * is already in favourites.
    */
   function isFavourite(episode) {
     return favourites.some(
@@ -132,6 +135,9 @@ function ShowDetails({
   /**
    * Add or remove an episode
    * from favourites.
+   *
+   * Saves the date the episode
+   * was favourited.
    */
   function toggleFavourite(episode) {
     if (isFavourite(episode)) {
@@ -139,9 +145,12 @@ function ShowDetails({
         favourites.filter(
           (fav) =>
             !(
-              fav.podcastId === podcast.id &&
-              fav.season === season.season &&
-              fav.episode === episode.episode
+              fav.podcastId ===
+                podcast.id &&
+              fav.season ===
+                season.season &&
+              fav.episode ===
+                episode.episode
             )
         )
       );
@@ -158,6 +167,13 @@ function ShowDetails({
 
         season: season.season,
 
+        /**
+         * Store when the episode
+         * was added to favourites.
+         */
+        addedAt:
+          new Date().toISOString(),
+
         ...episode,
       },
     ]);
@@ -166,7 +182,7 @@ function ShowDetails({
   return (
     <main className="show-details">
 
-      {/* BACK BUTTON */}
+      {/*BACK BUTTON*/}
 
       <Link
         to="/"
@@ -176,7 +192,7 @@ function ShowDetails({
         ← Back to Podcasts
       </Link>
 
-      {/* SHOW DETAILS */}
+      {/*SHOW DETAILS*/}
 
       <section className="show-header">
 
@@ -215,7 +231,7 @@ function ShowDetails({
 
       </section>
 
-      {/* SEASON NAVIGATION */}
+      {/*SEASON NAVIGATION*/}
 
       <section className="season-selector">
 
@@ -245,7 +261,7 @@ function ShowDetails({
 
       </section>
 
-      {/* SELECTED SEASON */}
+      {/*SELECTED SEASON*/}
 
       {season && (
         <section className="season-details">
@@ -269,7 +285,7 @@ function ShowDetails({
 
         </section>
       )}
-            {/* EPISODE LIST */}
+            {/*EPISODE LIST*/}
 
       {season && (
         <section className="episode-list">
@@ -285,7 +301,7 @@ function ShowDetails({
 
                 <div className="episode-content">
 
-                  {/* EPISODE HEADER */}
+                  {/*EPISODE HEADER*/}
 
                   <div className="episode-header">
 
@@ -296,28 +312,40 @@ function ShowDetails({
 
                     <div className="episode-actions">
 
+                      {/*FAVOURITE BUTTON*/}
+
                       <button
                         className="favourite-btn"
                         onClick={() =>
-                          toggleFavourite(episode)
+                          toggleFavourite(
+                            episode
+                          )
                         }
                       >
-                        {isFavourite(episode)
+                        {isFavourite(
+                          episode
+                        )
                           ? "❤️"
                           : "🤍"}
                       </button>
+
+                      {/*PLAY BUTTON*/}
 
                       <button
                         className="episode-play-btn"
                         onClick={() =>
                           setCurrentEpisode({
                             ...episode,
-                            podcastTitle:
-                              podcast.title,
-                            podcastImage:
-                              podcast.image,
+
                             podcastId:
                               podcast.id,
+
+                            podcastTitle:
+                              podcast.title,
+
+                            podcastImage:
+                              podcast.image,
+
                             season:
                               season.season,
                           })
@@ -329,6 +357,8 @@ function ShowDetails({
                     </div>
 
                   </div>
+
+                  {/*DESCRIPTION*/}
 
                   <p>
                     {episode.description

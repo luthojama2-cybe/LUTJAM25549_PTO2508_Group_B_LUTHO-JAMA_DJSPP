@@ -1,11 +1,31 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
+
+/**
+ * Formats the date an episode
+ * was added to favourites.
+ *
+ * @param {string} date
+ * @returns {string}
+ */
+function formatAddedDate(date) {
+  return new Date(date).toLocaleString(
+    "en-GB",
+    {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    }
+  );
+}
 
 /**
  * Favourites page.
  *
  * Displays all favourited episodes
- * and allows users to play or remove
- * them from their favourites.
+ * grouped by podcast title.
  *
  * @param {Object} props
  * @param {Array} props.favourites
@@ -20,7 +40,14 @@ function Favourites({
   setCurrentEpisode,
 }) {
   /**
-   * Remove an episode from favourites.
+   * Current sorting option.
+   */
+  const [sortOrder, setSortOrder] =
+    useState("newest");
+
+  /**
+   * Remove an episode
+   * from favourites.
    *
    * @param {Object} episode
    */
@@ -41,8 +68,65 @@ function Favourites({
   }
 
   /**
-   * Display an empty state when
-   * no favourites exist.
+   * Sort favourites.
+   */
+  const sortedFavourites = [
+    ...favourites,
+  ].sort((a, b) => {
+    switch (sortOrder) {
+      case "az":
+        return a.title.localeCompare(
+          b.title
+        );
+
+      case "za":
+        return b.title.localeCompare(
+          a.title
+        );
+
+      case "oldest":
+        return (
+          new Date(a.addedAt) -
+          new Date(b.addedAt)
+        );
+
+      case "newest":
+      default:
+        return (
+          new Date(b.addedAt) -
+          new Date(a.addedAt)
+        );
+    }
+  });
+
+  /**
+   * Group favourite episodes
+   * by podcast title.
+   */
+  const groupedFavourites =
+    sortedFavourites.reduce(
+      (groups, episode) => {
+        if (
+          !groups[
+            episode.podcastTitle
+          ]
+        ) {
+          groups[
+            episode.podcastTitle
+          ] = [];
+        }
+
+        groups[
+          episode.podcastTitle
+        ].push(episode);
+
+        return groups;
+      },
+      {}
+    );
+
+  /**
+   * Empty state.
    */
   if (favourites.length === 0) {
     return (
@@ -66,7 +150,7 @@ function Favourites({
           </h2>
 
           <p>
-            Tap the ❤️ icon on an
+            Tap the ❤️ icon on any
             episode to save it here.
           </p>
 
@@ -88,7 +172,7 @@ function Favourites({
         ← Back to Podcasts
       </Link>
 
-      {/*PAGE TITLE*/}
+      {/*PAGE HEADER*/}
 
       <section className="favourites-header">
 
@@ -106,81 +190,162 @@ function Favourites({
 
       </section>
 
-      {/*FAVOURITES LIST*/}
+      {/*SORT CONTROLS*/}
 
-      <section className="favourites-list">
+      <section className="favourites-controls">
 
-        {favourites.map((episode) => (
-          <article
-            key={`${episode.podcastId}-${episode.season}-${episode.episode}`}
-            className="favourite-card"
+        <label htmlFor="sort">
+          Sort By
+        </label>
+
+        <select
+          id="sort"
+          value={sortOrder}
+          onChange={(e) =>
+            setSortOrder(
+              e.target.value
+            )
+          }
+        >
+          <option value="newest">
+            Newest Added
+          </option>
+
+          <option value="oldest">
+            Oldest Added
+          </option>
+
+          <option value="az">
+            A–Z Title
+          </option>
+
+          <option value="za">
+            Z–A Title
+          </option>
+        </select>
+
+      </section>
+
+      {/*GROUPED FAVOURITES*/}
+
+      {Object.entries(
+        groupedFavourites
+      ).map(
+        ([
+          podcastTitle,
+          episodes,
+        ]) => (
+
+          <section
+            key={podcastTitle}
+            className="podcast-group"
           >
 
-            <img
-              src={episode.podcastImage}
-              alt={episode.podcastTitle}
-              className="favourite-image"
-            />
+            <h2 className="podcast-group-title">
+              {podcastTitle}
+            </h2>
 
-            <div className="favourite-content">
+            <div className="favourites-list">
 
-              <h2>
-                {episode.podcastTitle}
-              </h2>
+              {episodes.map(
+                (episode) => (
 
-              <h3>
-                Season {episode.season}
-                {" • "}
-                Episode {episode.episode}
-              </h3>
+                  <article
+                    key={`${episode.podcastId}-${episode.season}-${episode.episode}`}
+                    className="favourite-card"
+                  >
 
-              <h4>
-                {episode.title}
-              </h4>
+                    <img
+                      src={
+                        episode.podcastImage
+                      }
+                      alt={
+                        episode.podcastTitle
+                      }
+                      className="favourite-image"
+                    />
 
-              <p>
-                {episode.description
-                  ? episode.description
-                      .length > 180
-                    ? `${episode.description.substring(
-                        0,
-                        180
-                      )}...`
-                    : episode.description
-                  : "No description available."}
-              </p>
-                            {/*ACTIONS*/}
+                    <div className="favourite-content">
 
-              <div className="favourite-actions">
+                      <h3>
+                        Season{" "}
+                        {episode.season}
+                        {" • "}
+                        Episode{" "}
+                        {episode.episode}
+                      </h3>
 
-                <button
-                  className="episode-play-btn"
-                  onClick={() =>
-                    setCurrentEpisode({
-                      ...episode,
-                    })
-                  }
-                >
-                  ▶ Play
-                </button>
+                      <h4>
+                        {episode.title}
+                      </h4>
 
-                <button
-                  className="remove-favourite-btn"
-                  onClick={() =>
-                    removeFavourite(episode)
-                  }
-                >
-                  ❤️ Remove
-                </button>
+                      <p className="added-date">
 
-              </div>
+                        <strong>
+                          Added:
+                        </strong>{" "}
+
+                        {formatAddedDate(
+                          episode.addedAt
+                        )}
+
+                      </p>
+
+                      <p>
+
+                        {episode.description
+                          ? episode
+                              .description
+                              .length > 180
+                            ? `${episode.description.substring(
+                                0,
+                                180
+                              )}...`
+                            : episode.description
+                          : "No description available."}
+
+                      </p>
+                                            {/*ACTIONS*/}
+
+                      <div className="favourite-actions">
+
+                        <button
+                          className="episode-play-btn"
+                          onClick={() =>
+                            setCurrentEpisode({
+                              ...episode,
+                            })
+                          }
+                        >
+                          ▶ Play
+                        </button>
+
+                        <button
+                          className="remove-favourite-btn"
+                          onClick={() =>
+                            removeFavourite(
+                              episode
+                            )
+                          }
+                        >
+                          ❤️ Remove
+                        </button>
+
+                      </div>
+
+                    </div>
+
+                  </article>
+
+                )
+              )}
 
             </div>
 
-          </article>
-        ))}
+          </section>
 
-      </section>
+        )
+      )}
 
     </main>
   );
