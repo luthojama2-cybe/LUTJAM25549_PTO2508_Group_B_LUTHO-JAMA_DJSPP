@@ -300,7 +300,7 @@ function Home({
             to="/favourites"
             className="favourites-link"
           >
-            ❤️ Favourites
+            ❤️
           </Link>
 
           <button
