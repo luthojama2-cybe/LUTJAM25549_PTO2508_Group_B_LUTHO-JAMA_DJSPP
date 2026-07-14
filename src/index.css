@@ -875,6 +875,129 @@ a {
   transform: translateY(-2px);
 }
 
+/*RECOMMENDED SHOWS*/
+
+.recommended-section {
+  padding: 0 3rem 3rem;
+}
+
+/*SECTION HEADER*/
+
+.recommended-header {
+  display: flex;
+
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: 1.5rem;
+}
+
+.recommended-header h2 {
+  color: #111;
+
+  font-size: 1.8rem;
+}
+
+/*CAROUSEL BUTTONS*/
+
+.carousel-buttons {
+  display: flex;
+
+  gap: .75rem;
+}
+
+.carousel-btn {
+  width: 45px;
+  height: 45px;
+
+  border: none;
+  border-radius: 50%;
+
+  background: #111;
+  color: white;
+
+  font-size: 1rem;
+
+  cursor: pointer;
+
+  transition: .25s;
+}
+
+.carousel-btn:hover {
+  background: #333;
+
+  transform: scale(1.08);
+}
+
+/*CAROUSEL*/
+
+.recommended-carousel {
+  display: flex;
+
+  gap: 1.5rem;
+
+  overflow-x: auto;
+
+  scroll-behavior: smooth;
+
+  padding-bottom: .5rem;
+
+  scrollbar-width: none;
+}
+
+.recommended-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+/*RECOMMENDED CARD*/
+
+.recommended-card {
+  flex: 0 0 240px;
+
+  background: white;
+
+  border-radius: 16px;
+
+  overflow: hidden;
+
+  box-shadow: 0 4px 12px rgba(0,0,0,.08);
+
+  transition: .25s;
+}
+
+.recommended-card:hover {
+  transform: translateY(-6px);
+
+  box-shadow: 0 8px 20px rgba(0,0,0,.12);
+}
+
+.recommended-card img {
+  width: 100%;
+  height: 220px;
+
+  object-fit: cover;
+}
+
+/*CARD CONTENT*/
+
+.recommended-content {
+  padding: 1rem;
+}
+
+.recommended-content h3 {
+  margin-bottom: .75rem;
+
+  color: #111;
+
+  font-size: 1rem;
+
+  line-height: 1.4;
+}
+
+.recommended-content p {
+  color: #666;
+}
+
 /*RESPONSIVE DESIGN*/
 
 @media (max-width: 900px) {
@@ -987,6 +1110,26 @@ a {
   align-items: stretch;
 }
 
+.recommended-section {
+  padding: 0 1.5rem 2rem;
+}
+
+.recommended-header {
+  flex-direction: column;
+
+  align-items: flex-start;
+
+  gap: 1rem;
+}
+
+.carousel-buttons {
+  align-self: flex-end;
+}
+
+.recommended-card {
+  flex: 0 0 200px;
+}
+
 }
 
 @media (max-width: 480px) {
@@ -1050,5 +1193,19 @@ a {
 .favourite-btn {
   width: 50px;
   height: 50px;
+}
+
+.recommended-header h2 {
+  font-size: 1.5rem;
+}
+
+.carousel-buttons {
+  width: 100%;
+
+  justify-content: center;
+}
+
+.recommended-card {
+  flex: 0 0 180px;
 }
 }

@@ -7,42 +7,50 @@ import {
   Link,
   useLocation,
 } from "react-router-dom";
+
 import { getPodcasts } from "../services/api";
-import PodcastPreviewCard from "../components/PodcastPreviewCard.jsx";
+import PodcastPreviewCard from "../components/PodcastPreviewCard";
+import RecommendedCarousel from "../components/RecommendedCarousel";
 import { genres } from "../data/data";
 
 /**
- * Creates a lookup object for genre names.
+ * Creates a lookup object
+ * for genre names.
  */
 const genreMap = Object.fromEntries(
-  genres.map((genre) => [genre.id, genre.title])
+  genres.map((genre) => [
+    genre.id,
+    genre.title,
+  ])
 );
 
 /**
- * A subset of genres displayed in the
- * filter dropdown for a simpler UI.
+ * Genres displayed
+ * in the filter.
  */
-const featuredGenres = genres.filter((genre) =>
-  [
-    "History",
-    "Comedy",
-    "Business",
-    "News",
-    "Personal Growth",
-    "Investigative Journalism",
-  ].includes(genre.title)
-);
+const featuredGenres =
+  genres.filter((genre) =>
+    [
+      "History",
+      "Comedy",
+      "Business",
+      "News",
+      "Personal Growth",
+      "Investigative Journalism",
+    ].includes(genre.title)
+  );
 
 /**
- * Converts an ISO date string into a
- * human-readable relative date.
+ * Converts an ISO date
+ * into a readable format.
  *
  * @param {string} updated
  * @returns {string}
  */
 function formatLastUpdated(updated) {
   const days = Math.floor(
-    (Date.now() - new Date(updated)) /
+    (Date.now() -
+      new Date(updated)) /
       86400000
   );
 
@@ -55,8 +63,13 @@ function formatLastUpdated(updated) {
     [1, "day"],
   ];
 
-  for (const [size, label] of units) {
-    const value = Math.floor(days / size);
+  for (const [
+    size,
+    label,
+  ] of units) {
+    const value = Math.floor(
+      days / size
+    );
 
     if (value >= 1) {
       return `${value} ${label}${
@@ -69,66 +82,72 @@ function formatLastUpdated(updated) {
 }
 
 /**
- * Home page component.
- *
- * Features:
- * - Fetch podcasts
- * - Search podcasts
- * - Filter by genre
- * - Sort by title (A–Z / Z–A)
- * - Pagination
- * - Preserve state when returning
- *   from Show Details
+ * Home page.
  *
  * @returns {JSX.Element}
  */
 function Home() {
-  const location = useLocation();
+  const location =
+    useLocation();
 
   /**
-   * Prevent pagination from resetting
-   * on the initial render.
+   * Prevent page reset
+   * on initial render.
    */
-  const firstRender = useRef(true);
+  const firstRender =
+    useRef(true);
 
-  const [podcasts, setPodcasts] =
-    useState([]);
+  const [
+    podcasts,
+    setPodcasts,
+  ] = useState([]);
 
-  const [loading, setLoading] =
-    useState(true);
+  const [
+    loading,
+    setLoading,
+  ] = useState(true);
 
-  const [error, setError] =
-    useState(null);
+  const [
+    error,
+    setError,
+  ] = useState(null);
 
   /**
-   * Restore previous Home state.
+   * Restore Home state.
    */
-  const [searchTerm, setSearchTerm] =
-    useState(
-      location.state?.searchTerm || ""
-    );
+  const [
+    searchTerm,
+    setSearchTerm,
+  ] = useState(
+    location.state
+      ?.searchTerm || ""
+  );
 
   const [
     selectedGenre,
     setSelectedGenre,
   ] = useState(
-    location.state?.selectedGenre ||
+    location.state
+      ?.selectedGenre ||
       "all"
   );
 
-  const [sortOrder, setSortOrder] =
-    useState(
-      location.state?.sortOrder || "az"
-    );
+  const [
+    sortOrder,
+    setSortOrder,
+  ] = useState(
+    location.state
+      ?.sortOrder || "az"
+  );
 
-  const [currentPage, setCurrentPage] =
-    useState(
-      location.state?.currentPage || 1
-    );
+  const [
+    currentPage,
+    setCurrentPage,
+  ] = useState(
+    location.state
+      ?.currentPage || 1
+  );
 
-  /**
-   * Podcasts displayed per page.
-   */
   const podcastsPerPage = 12;
 
   /**
@@ -142,7 +161,9 @@ function Home() {
 
         setPodcasts(data);
       } catch (err) {
-        setError(err.message);
+        setError(
+          err.message
+        );
       } finally {
         setLoading(false);
       }
@@ -152,15 +173,15 @@ function Home() {
   }, []);
 
   /**
-   * Reset pagination whenever the user
-   * changes the search, genre or sort.
-   * Skip the initial render so that
-   * returning from ShowDetails keeps
-   * the previous page.
+   * Reset pagination.
    */
   useEffect(() => {
-    if (firstRender.current) {
-      firstRender.current = false;
+    if (
+      firstRender.current
+    ) {
+      firstRender.current =
+        false;
+
       return;
     }
 
@@ -172,40 +193,52 @@ function Home() {
   ]);
 
   /**
-   * Working copy of podcasts.
+   * Working podcast list.
    */
-  let results = [...podcasts];
+  let results = [
+    ...podcasts,
+  ];
 
   /**
-   * Search by title.
+   * Search.
    */
-  results = results.filter((podcast) =>
-    podcast.title
-      .toLowerCase()
-      .includes(
-        searchTerm
-          .trim()
-          .toLowerCase()
-      )
+  results = results.filter(
+    (podcast) =>
+      podcast.title
+        .toLowerCase()
+        .includes(
+          searchTerm
+            .trim()
+            .toLowerCase()
+        )
   );
 
   /**
-   * Filter by genre.
+   * Genre filter.
    */
-  if (selectedGenre !== "all") {
+  if (
+    selectedGenre !== "all"
+  ) {
     results = results.filter(
       (podcast) =>
-        (podcast.genres || []).includes(
-          Number(selectedGenre)
+        (
+          podcast.genres ||
+          []
+        ).includes(
+          Number(
+            selectedGenre
+          )
         )
     );
   }
 
   /**
-   * Sort alphabetically.
+   * Sort.
    */
   results.sort((a, b) => {
-    if (sortOrder === "az") {
+    if (
+      sortOrder === "az"
+    ) {
       return a.title.localeCompare(
         b.title
       );
@@ -217,11 +250,19 @@ function Home() {
   });
 
   /**
-   * Pagination calculations.
+   * Recommended shows.
    */
-  const totalPages = Math.ceil(
-    results.length / podcastsPerPage
-  );
+  const recommendedShows =
+    podcasts.slice(0, 10);
+
+  /**
+   * Pagination.
+   */
+  const totalPages =
+    Math.ceil(
+      results.length /
+        podcastsPerPage
+    );
 
   const startIndex =
     (currentPage - 1) *
@@ -252,13 +293,16 @@ function Home() {
 
   return (
     <>
+
       {/*NAVBAR*/}
 
       <header className="navbar">
 
         <div className="logo">
           <span>🎙️</span>
-          <h1>PodcastApp</h1>
+          <h1>
+            PodcastApp
+          </h1>
         </div>
 
         <div className="navbar-actions">
@@ -266,7 +310,9 @@ function Home() {
           <input
             type="text"
             placeholder="Search podcasts..."
-            value={searchTerm}
+            value={
+              searchTerm
+            }
             onChange={(e) =>
               setSearchTerm(
                 e.target.value
@@ -285,29 +331,41 @@ function Home() {
         </div>
 
       </header>
-            {/*FILTERS*/}
+
+      {/*FILTERS*/}
 
       <section className="controls">
+
         <select
-          value={selectedGenre}
+          value={
+            selectedGenre
+          }
           onChange={(e) =>
             setSelectedGenre(
               e.target.value
             )
           }
         >
+
           <option value="all">
             All Genres
           </option>
 
-          {featuredGenres.map((genre) => (
-            <option
-              key={genre.id}
-              value={genre.id}
-            >
-              {genre.title}
-            </option>
-          ))}
+          {featuredGenres.map(
+            (genre) => (
+              <option
+                key={
+                  genre.id
+                }
+                value={
+                  genre.id
+                }
+              >
+                {genre.title}
+              </option>
+            )
+          )}
+
         </select>
 
         <select
@@ -318,6 +376,7 @@ function Home() {
             )
           }
         >
+
           <option value="az">
             Title A-Z
           </option>
@@ -325,10 +384,31 @@ function Home() {
           <option value="za">
             Title Z-A
           </option>
+
         </select>
+
       </section>
 
-      {/*RESULTS*/}
+      {/*RECOMMENDED SHOWS*/}
+
+      <RecommendedCarousel
+        podcasts={
+          recommendedShows
+        }
+        searchTerm={
+          searchTerm
+        }
+        selectedGenre={
+          selectedGenre
+        }
+        sortOrder={
+          sortOrder
+        }
+        currentPage={
+          currentPage
+        }
+      />
+            {/*RESULTS*/}
 
       {paginatedResults.length === 0 ? (
         <h2 className="empty-state">
@@ -340,9 +420,10 @@ function Home() {
 
             {paginatedResults.map(
               (podcast) => {
+
                 /**
-                 * Convert genre IDs into
-                 * readable genre names.
+                 * Convert genre IDs
+                 * into names.
                  */
                 const genreNames = (
                   podcast.genres || []
@@ -362,7 +443,9 @@ function Home() {
                     seasons={
                       podcast.seasons
                     }
-                    genres={genreNames}
+                    genres={
+                      genreNames
+                    }
                     updated={formatLastUpdated(
                       podcast.updated
                     )}
@@ -434,6 +517,7 @@ function Home() {
           </div>
         </>
       )}
+
     </>
   );
 }
