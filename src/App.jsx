@@ -1,4 +1,7 @@
-import { useState, useEffect } from "react";
+import {
+  useState,
+  useEffect,
+} from "react";
 import {
   Routes,
   Route,
@@ -7,7 +10,6 @@ import {
 import Home from "./pages/Home";
 import ShowDetails from "./pages/ShowDetails";
 import Favourites from "./pages/Favourites";
-
 import AudioPlayer from "./components/AudioPlayer";
 
 /**
@@ -17,41 +19,47 @@ import AudioPlayer from "./components/AudioPlayer";
  * - Routing
  * - Global audio player
  * - Favourite episodes
+ * - Light/Dark theme
  *
  * @returns {JSX.Element}
  */
 function App() {
+
   /**
    * Currently playing episode.
    */
-  const [
-    currentEpisode,
-    setCurrentEpisode,
-  ] = useState(null);
+  const [currentEpisode, setCurrentEpisode] =
+    useState(null);
 
   /**
    * Favourite episodes.
-   *
-   * Loaded from localStorage so they
-   * persist across browser sessions.
    */
-  const [
-    favourites,
-    setFavourites,
-  ] = useState(() => {
-    const saved =
-      localStorage.getItem(
-        "favourites"
-      );
+  const [favourites, setFavourites] =
+    useState(() => {
+      const saved =
+        localStorage.getItem(
+          "favourites"
+        );
 
-    return saved
-      ? JSON.parse(saved)
-      : [];
-  });
+      return saved
+        ? JSON.parse(saved)
+        : [];
+    });
 
   /**
-   * Save favourites whenever they
-   * change.
+   * Current application theme.
+   */
+  const [theme, setTheme] =
+    useState(() => {
+      return (
+        localStorage.getItem(
+          "theme"
+        ) || "light"
+      );
+    });
+
+  /**
+   * Save favourites.
    */
   useEffect(() => {
     localStorage.setItem(
@@ -60,18 +68,72 @@ function App() {
     );
   }, [favourites]);
 
+  /**
+   * Save selected theme.
+   */
+  useEffect(() => {
+    localStorage.setItem(
+      "theme",
+      theme
+    );
+
+    document.body.setAttribute(
+      "data-theme",
+      theme
+    );
+  }, [theme]);
+
+  /**
+   * Warn users before refreshing
+   * while audio is playing.
+   */
+  useEffect(() => {
+    function handleBeforeUnload(
+      event
+    ) {
+      if (!currentEpisode) return;
+
+      event.preventDefault();
+      event.returnValue = "";
+    }
+
+    window.addEventListener(
+      "beforeunload",
+      handleBeforeUnload
+    );
+
+    return () =>
+      window.removeEventListener(
+        "beforeunload",
+        handleBeforeUnload
+      );
+  }, [currentEpisode]);
+
+  /**
+   * Toggle between
+   * Light and Dark mode.
+   */
+  function toggleTheme() {
+    setTheme((prev) =>
+      prev === "light"
+        ? "dark"
+        : "light"
+    );
+  }
+
   return (
     <>
       <Routes>
 
-        {/*HOME*/}
-
         <Route
           path="/"
-          element={<Home />}
+          element={
+            <Home
+              theme={theme}
+              toggleTheme={toggleTheme}
+            />
+          }
         />
-
-        {/*SHOW DETAILS*/}
 
         <Route
           path="/show/:id"
@@ -86,11 +148,13 @@ function App() {
               setFavourites={
                 setFavourites
               }
+              theme={theme}
+              toggleTheme={
+                toggleTheme
+              }
             />
           }
         />
-
-        {/*FAVOURITES*/}
 
         <Route
           path="/favourites"
@@ -105,20 +169,21 @@ function App() {
               setCurrentEpisode={
                 setCurrentEpisode
               }
+              theme={theme}
+              toggleTheme={
+                toggleTheme
+              }
             />
           }
         />
 
       </Routes>
 
-      {/*GLOBAL AUDIO PLAYER*/}
-
       <AudioPlayer
         currentEpisode={
           currentEpisode
         }
       />
-
     </>
   );
 }

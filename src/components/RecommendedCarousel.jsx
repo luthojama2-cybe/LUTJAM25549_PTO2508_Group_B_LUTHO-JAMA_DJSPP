@@ -70,7 +70,7 @@ function RecommendedCarousel({
       <div className="recommended-header">
 
         <h2>
-          ⭐ Recommended Shows
+           Recommended Shows
         </h2>
 
         <div className="carousel-buttons">
@@ -79,14 +79,14 @@ function RecommendedCarousel({
             className="carousel-btn"
             onClick={scrollLeft}
           >
-            ◀
+            ←
           </button>
 
           <button
             className="carousel-btn"
             onClick={scrollRight}
           >
-            ▶
+            →
           </button>
 
         </div>

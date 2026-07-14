@@ -84,9 +84,16 @@ function formatLastUpdated(updated) {
 /**
  * Home page.
  *
+ * @param {Object} props
+ * @param {string} props.theme
+ * @param {Function} props.toggleTheme
+ *
  * @returns {JSX.Element}
  */
-function Home() {
+function Home({
+  theme,
+  toggleTheme,
+}) {
   const location =
     useLocation();
 
@@ -119,8 +126,8 @@ function Home() {
     searchTerm,
     setSearchTerm,
   ] = useState(
-    location.state
-      ?.searchTerm || ""
+    location.state?.searchTerm ||
+      ""
   );
 
   const [
@@ -128,31 +135,27 @@ function Home() {
     setSelectedGenre,
   ] = useState(
     location.state
-      ?.selectedGenre ||
-      "all"
+      ?.selectedGenre || "all"
   );
 
   const [
     sortOrder,
     setSortOrder,
   ] = useState(
-    location.state
-      ?.sortOrder || "az"
+    location.state?.sortOrder ||
+      "az"
   );
 
   const [
     currentPage,
     setCurrentPage,
   ] = useState(
-    location.state
-      ?.currentPage || 1
+    location.state?.currentPage ||
+      1
   );
 
   const podcastsPerPage = 12;
 
-  /**
-   * Fetch podcasts.
-   */
   useEffect(() => {
     async function loadPodcasts() {
       try {
@@ -161,9 +164,7 @@ function Home() {
 
         setPodcasts(data);
       } catch (err) {
-        setError(
-          err.message
-        );
+        setError(err.message);
       } finally {
         setLoading(false);
       }
@@ -172,9 +173,6 @@ function Home() {
     loadPodcasts();
   }, []);
 
-  /**
-   * Reset pagination.
-   */
   useEffect(() => {
     if (
       firstRender.current
@@ -192,16 +190,8 @@ function Home() {
     sortOrder,
   ]);
 
-  /**
-   * Working podcast list.
-   */
-  let results = [
-    ...podcasts,
-  ];
+  let results = [...podcasts];
 
-  /**
-   * Search.
-   */
   results = results.filter(
     (podcast) =>
       podcast.title
@@ -213,17 +203,13 @@ function Home() {
         )
   );
 
-  /**
-   * Genre filter.
-   */
   if (
     selectedGenre !== "all"
   ) {
     results = results.filter(
       (podcast) =>
         (
-          podcast.genres ||
-          []
+          podcast.genres || []
         ).includes(
           Number(
             selectedGenre
@@ -232,9 +218,6 @@ function Home() {
     );
   }
 
-  /**
-   * Sort.
-   */
   results.sort((a, b) => {
     if (
       sortOrder === "az"
@@ -249,15 +232,9 @@ function Home() {
     );
   });
 
-  /**
-   * Recommended shows.
-   */
   const recommendedShows =
     podcasts.slice(0, 10);
 
-  /**
-   * Pagination.
-   */
   const totalPages =
     Math.ceil(
       results.length /
@@ -310,9 +287,7 @@ function Home() {
           <input
             type="text"
             placeholder="Search podcasts..."
-            value={
-              searchTerm
-            }
+            value={searchTerm}
             onChange={(e) =>
               setSearchTerm(
                 e.target.value
@@ -328,6 +303,16 @@ function Home() {
             ❤️ Favourites
           </Link>
 
+          <button
+            className="theme-toggle"
+            onClick={toggleTheme}
+            aria-label="Toggle theme"
+          >
+            {theme === "light"
+              ? "🌙"
+              : "☀️"}
+          </button>
+
         </div>
 
       </header>
@@ -337,16 +322,13 @@ function Home() {
       <section className="controls">
 
         <select
-          value={
-            selectedGenre
-          }
+          value={selectedGenre}
           onChange={(e) =>
             setSelectedGenre(
               e.target.value
             )
           }
         >
-
           <option value="all">
             All Genres
           </option>
@@ -354,18 +336,13 @@ function Home() {
           {featuredGenres.map(
             (genre) => (
               <option
-                key={
-                  genre.id
-                }
-                value={
-                  genre.id
-                }
+                key={genre.id}
+                value={genre.id}
               >
                 {genre.title}
               </option>
             )
           )}
-
         </select>
 
         <select
@@ -376,7 +353,6 @@ function Home() {
             )
           }
         >
-
           <option value="az">
             Title A-Z
           </option>
@@ -384,7 +360,6 @@ function Home() {
           <option value="za">
             Title Z-A
           </option>
-
         </select>
 
       </section>
@@ -423,7 +398,7 @@ function Home() {
 
                 /**
                  * Convert genre IDs
-                 * into names.
+                 * into genre names.
                  */
                 const genreNames = (
                   podcast.genres || []
@@ -515,6 +490,7 @@ function Home() {
             </button>
 
           </div>
+
         </>
       )}
 

@@ -31,6 +31,8 @@ function formatAddedDate(date) {
  * @param {Array} props.favourites
  * @param {Function} props.setFavourites
  * @param {Function} props.setCurrentEpisode
+ * @param {string} props.theme
+ * @param {Function} props.toggleTheme
  *
  * @returns {JSX.Element}
  */
@@ -38,9 +40,12 @@ function Favourites({
   favourites,
   setFavourites,
   setCurrentEpisode,
+  theme,
+  toggleTheme,
 }) {
+
   /**
-   * Current sorting option.
+   * Current sort option.
    */
   const [sortOrder, setSortOrder] =
     useState("newest");
@@ -74,6 +79,7 @@ function Favourites({
     ...favourites,
   ].sort((a, b) => {
     switch (sortOrder) {
+
       case "az":
         return a.title.localeCompare(
           b.title
@@ -100,12 +106,13 @@ function Favourites({
   });
 
   /**
-   * Group favourite episodes
+   * Group favourites
    * by podcast title.
    */
   const groupedFavourites =
     sortedFavourites.reduce(
       (groups, episode) => {
+
         if (
           !groups[
             episode.podcastTitle
@@ -121,6 +128,7 @@ function Favourites({
         ].push(episode);
 
         return groups;
+
       },
       {}
     );
@@ -132,14 +140,28 @@ function Favourites({
     return (
       <main className="favourites-page">
 
-        {/*BACK BUTTON*/}
+        {/*PAGE ACTIONS*/}
 
-        <Link
-          to="/"
-          className="back-button"
-        >
-          ← Back to Podcasts
-        </Link>
+        <div className="page-actions">
+
+          <Link
+            to="/"
+            className="back-button"
+          >
+            ← Back to Podcasts
+          </Link>
+
+          <button
+            className="theme-toggle"
+            onClick={toggleTheme}
+            aria-label="Toggle theme"
+          >
+            {theme === "light"
+              ? "🌙"
+              : "☀️"}
+          </button>
+
+        </div>
 
         {/*EMPTY STATE*/}
 
@@ -163,14 +185,28 @@ function Favourites({
   return (
     <main className="favourites-page">
 
-      {/*BACK BUTTON*/}
+      {/*PAGE ACTIONS*/}
 
-      <Link
-        to="/"
-        className="back-button"
-      >
-        ← Back to Podcasts
-      </Link>
+      <div className="page-actions">
+
+        <Link
+          to="/"
+          className="back-button"
+        >
+          ← Back to Podcasts
+        </Link>
+
+        <button
+          className="theme-toggle"
+          onClick={toggleTheme}
+          aria-label="Toggle theme"
+        >
+          {theme === "light"
+            ? "🌙"
+            : "☀️"}
+        </button>
+
+      </div>
 
       {/*PAGE HEADER*/}
 
@@ -256,23 +292,17 @@ function Favourites({
                   >
 
                     <img
-                      src={
-                        episode.podcastImage
-                      }
-                      alt={
-                        episode.podcastTitle
-                      }
+                      src={episode.podcastImage}
+                      alt={episode.podcastTitle}
                       className="favourite-image"
                     />
 
                     <div className="favourite-content">
 
                       <h3>
-                        Season{" "}
-                        {episode.season}
+                        Season {episode.season}
                         {" • "}
-                        Episode{" "}
-                        {episode.episode}
+                        Episode {episode.episode}
                       </h3>
 
                       <h4>
@@ -294,9 +324,7 @@ function Favourites({
                       <p>
 
                         {episode.description
-                          ? episode
-                              .description
-                              .length > 180
+                          ? episode.description.length > 180
                             ? `${episode.description.substring(
                                 0,
                                 180

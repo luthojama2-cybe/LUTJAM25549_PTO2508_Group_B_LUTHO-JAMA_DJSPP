@@ -24,6 +24,8 @@ const genreMap = Object.fromEntries(
  * @param {Function} props.setCurrentEpisode
  * @param {Array} props.favourites
  * @param {Function} props.setFavourites
+ * @param {string} props.theme
+ * @param {Function} props.toggleTheme
  *
  * @returns {JSX.Element}
  */
@@ -31,7 +33,10 @@ function ShowDetails({
   setCurrentEpisode,
   favourites,
   setFavourites,
+  theme,
+  toggleTheme,
 }) {
+
   /**
    * Podcast ID from URL.
    */
@@ -114,14 +119,14 @@ function ShowDetails({
     );
 
   /**
-   * Currently selected season.
+   * Current season.
    */
   const season =
     podcast.seasons[selectedSeason];
 
   /**
-   * Returns true if an episode
-   * is already in favourites.
+   * Check whether an episode
+   * is already favourited.
    */
   function isFavourite(episode) {
     return favourites.some(
@@ -133,11 +138,7 @@ function ShowDetails({
   }
 
   /**
-   * Add or remove an episode
-   * from favourites.
-   *
-   * Saves the date the episode
-   * was favourited.
+   * Toggle favourite.
    */
   function toggleFavourite(episode) {
     if (isFavourite(episode)) {
@@ -167,10 +168,6 @@ function ShowDetails({
 
         season: season.season,
 
-        /**
-         * Store when the episode
-         * was added to favourites.
-         */
         addedAt:
           new Date().toISOString(),
 
@@ -182,15 +179,29 @@ function ShowDetails({
   return (
     <main className="show-details">
 
-      {/*BACK BUTTON*/}
+      {/*PAGE ACTIONS*/}
 
-      <Link
-        to="/"
-        state={location.state}
-        className="back-button"
-      >
-        ← Back to Podcasts
-      </Link>
+      <div className="page-actions">
+
+        <Link
+          to="/"
+          state={location.state}
+          className="back-button"
+        >
+          ← Back to Podcasts
+        </Link>
+
+        <button
+          className="theme-toggle"
+          onClick={toggleTheme}
+          aria-label="Toggle theme"
+        >
+          {theme === "light"
+            ? "🌙"
+            : "☀️"}
+        </button>
+
+      </div>
 
       {/*SHOW DETAILS*/}
 
@@ -294,6 +305,7 @@ function ShowDetails({
 
           {season.episodes.map(
             (episode) => (
+
               <article
                 key={`${season.season}-${episode.episode}`}
                 className="episode-card"
@@ -336,16 +348,12 @@ function ShowDetails({
                         onClick={() =>
                           setCurrentEpisode({
                             ...episode,
-
                             podcastId:
                               podcast.id,
-
                             podcastTitle:
                               podcast.title,
-
                             podcastImage:
                               podcast.image,
-
                             season:
                               season.season,
                           })
@@ -361,8 +369,10 @@ function ShowDetails({
                   {/*DESCRIPTION*/}
 
                   <p>
+
                     {episode.description
-                      ? episode.description
+                      ? episode
+                          .description
                           .length > 180
                         ? `${episode.description.substring(
                             0,
@@ -370,11 +380,13 @@ function ShowDetails({
                           )}...`
                         : episode.description
                       : "No description available."}
+
                   </p>
 
                 </div>
 
               </article>
+
             )
           )}
 
